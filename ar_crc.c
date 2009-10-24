@@ -40,7 +40,7 @@ main(int argc, char *argv[])
 		total_length += length[i];
 	}
 
-	length[track_count-1] -= 5*SAMPLES_PER_FRAME-1;
+	length[track_count-1] -= 5*SAMPLES_PER_FRAME;
 
 	uint32_t crc[track_count];
 	memset(crc, '\0', track_count*sizeof(uint32_t));
