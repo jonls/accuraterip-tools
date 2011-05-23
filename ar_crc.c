@@ -27,7 +27,7 @@ main(int argc, char *argv[])
 	/* Reopen stdin as binary */
 	if (freopen(NULL, "rb", stdin) == NULL) {
 		perror("freopen");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
 	int offset = atoi(argv[1]);
@@ -43,10 +43,17 @@ main(int argc, char *argv[])
 	length[track_count-1] -= 5*SAMPLES_PER_FRAME;
 
 	uint32_t *crc = calloc(track_count, sizeof(uint32_t));
-	if (crc == NULL) abort();
+	if (crc == NULL) {
+		fprintf(stderr, "Unable to allocate memory.\n");
+		exit(EXIT_FAILURE);
+	}
 
 	uint32_t *crc450 = calloc(track_count, sizeof(uint32_t));
-	if (crc450 == NULL) abort();
+	if (crc450 == NULL) {
+		fprintf(stderr, "Unable to allocate memory.\n");
+		free(crc);
+		exit(EXIT_FAILURE);
+	}
 
 	int track = 0;
 	int di = 5*SAMPLES_PER_FRAME-1 + offset;
@@ -58,10 +65,10 @@ main(int argc, char *argv[])
 		int r = read_value(stdin, &value);
 		if (r == 0) {
 			fprintf(stderr, "Unexpected EOF.\n");
-			return EXIT_FAILURE;
+			exit(EXIT_FAILURE);
 		} else if (r < 0) {
 			perror("read_value");	
-			return EXIT_FAILURE;
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -78,10 +85,10 @@ main(int argc, char *argv[])
 		int r = read_value(stdin, &value);
 		if (r == 0) {
 			fprintf(stderr, "Unexpected EOF.\n");
-			return EXIT_FAILURE;
+			exit(EXIT_FAILURE);
 		} else if (r < 0) {
 			perror("read_value");
-			return EXIT_FAILURE;
+			exit(EXIT_FAILURE);
 		}
 
 		/* Update CRC */

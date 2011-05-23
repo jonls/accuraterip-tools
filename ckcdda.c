@@ -67,7 +67,7 @@ main(int argc, char *argv[])
 	/* Reopen stdin as binary */
 	if (freopen(NULL, "rb", stdin) == NULL) {
 		perror("freopen");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
 	int track_count = argc-1;
@@ -75,7 +75,10 @@ main(int argc, char *argv[])
  
 	int total_length = 0;
 	int *length = calloc(track_count+1, sizeof(int));
-	if (length == NULL) abort();
+	if (length == NULL) {
+		fprintf(stderr, "Unable to allocate memory.\n");
+		exit(EXIT_FAILURE);
+	}
 
 	for (int i = 0; i < track_count; i++) {
 		length[i] = atoi(argv[i+1])*SAMPLES_PER_FRAME;
@@ -89,10 +92,19 @@ main(int argc, char *argv[])
 	for (int i = 0; i < track_count+1; i++) printf("len(%i): %i\n", i, length[i]);
 
 	uint32_t *sum = calloc(track_count, sizeof(uint32_t));
-	if (sum == NULL) abort();
+	if (sum == NULL) {
+		fprintf(stderr, "Unable to allocate memory.\n");
+		free(length);
+		exit(EXIT_FAILURE);
+	}
 
 	uint32_t *arcf = calloc(track_count*ARCFS_PER_TRACK, sizeof(uint32_t));
-	if (arcf == NULL) abort();
+	if (arcf == NULL) {
+		fprintf(stderr, "Unable to allocate memory.\n");
+		free(length);
+		free(sum);
+		exit(EXIT_FAILURE);
+	}
 
 	int track = 0;
 	printf("At track %u (%u, %u)\n", track, track < track_count, track > 0);
@@ -108,10 +120,10 @@ main(int argc, char *argv[])
 		int r = read_value(stdin, &value);
 		if (r == 0) {
 			fprintf(stderr, "Unexpected EOF.\n");
-			return EXIT_FAILURE;
+			exit(EXIT_FAILURE);
 		} else if (r < 0) {
 			perror("read_value");
-			return EXIT_FAILURE;
+			exit(EXIT_FAILURE);
 		}
 
 		/* Update ARCF values */

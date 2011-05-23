@@ -86,7 +86,7 @@ main(int argc, char *argv[])
 	/* Reopen stdin as binary */
 	if (freopen(NULL, "rb", stdin) == NULL) {
 		perror("freopen");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
 	uint32_t crc = 0xffffffff;
@@ -102,7 +102,7 @@ main(int argc, char *argv[])
 				break;
 			}
 			perror("fread");
-			return EXIT_FAILURE;
+			exit(EXIT_FAILURE);
 		}
 
 		/* Update CRC */
